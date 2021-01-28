@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+// eslint-disable-next-line 
+import {Router,Route,Link} from 'react-router';
+
 import './index.css';
+import {TestPage} from './started/index.js'
 // class Square extends React.Component {
 //     constructor(props) {
 //         super(props);
@@ -19,7 +23,7 @@ import './index.css';
 // 把Square改成函数式组件
 function Square(props) {
     return (
-        // 这里的props.onClick不可为props.onClick()
+        // 这里的props.onClick不可为props.onClick()，不是props内 是js原生的方法除外
         <button className="square" onClick={props.onClick}>
             {props.value}
         </button>
@@ -58,7 +62,7 @@ class Board extends React.Component {
         );
     }
 }
-
+// eslint-disable-next-line 
 class Game extends React.Component {
     constructor(props) {
         // 
@@ -74,6 +78,7 @@ class Game extends React.Component {
         };
     }
     handleClick(i) {
+        // React需要深拷贝来维持稳定性
         const history = this.state.history.slice(0, this.state.stepNumber + 1);
         const current = history[history.length - 1];
         const squares = current.squares.slice();
@@ -81,13 +86,14 @@ class Game extends React.Component {
             return;
         }
         squares[i] = this.state.xIsnext ? 'X' : 'O';
+        // update state
         this.setState({
-                history: history.concat([{
-                    squares: squares,
-                }]),
-                xIsnext: !this.state.xIsnext,
-                stepNumber: history.length,
-            });
+            history: history.concat([{
+                squares: squares,
+            }]),
+            xIsnext: !this.state.xIsnext,
+            stepNumber: history.length,
+        });
     }
     jumpTo(step) {
         this.setState({
@@ -99,7 +105,7 @@ class Game extends React.Component {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
         const winner = calculateWinner(current.squares);
-        
+
         const moves = history.map((step, move) => {
             const desc = move ?
                 'Go to move #' + move :
@@ -120,12 +126,14 @@ class Game extends React.Component {
         return (
             <div className="game">
                 <div className="game-board">
+                    {/* this is the props*/}
                     <Board
                         squares={current.squares}
                         onClick={i => this.handleClick(i)}
                     />
                 </div>
                 <div className="game-info">
+                    {/* item in state can  into the {} */}
                     <div>{status}</div>
                     <ol>{moves}</ol>
                 </div>
@@ -136,8 +144,11 @@ class Game extends React.Component {
 
 // ========================================
 
+// 进行渲染
 ReactDOM.render(
-    <Game />,
+    // <Game />,
+    <TestPage />,
+    // root was in ~/public/index.html
     document.getElementById('root')
 );
 
