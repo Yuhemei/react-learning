@@ -2,41 +2,91 @@ import React from 'react';
 import './index.css';
 
 // 组件
-// 输入框
-// eslint-disable-next-line 
-function InputItem(props) {
+// 顶部SearchBar
+function SearchBar(props) {
     // name label value
     return (
-        <div>
-            <label for={props.name}>{props.label}</label>
-            <input name={props.name} type="text" value={props.value}></input>
-        </div>
+        <form>
+            <input type="text" placeholder="Search..." />
+            <p>
+                <input type="checkbox"/>
+                {''}
+                Only show products in stock
+            </p>
+        </form>
     )
 };
-
-// 选择框
-// eslint-disable-next-line 
-function CheckItem(props) {
-    return (
-        <input type="checkbox" name="check"></input>
-    )
-};
-// 标题栏
-// eslint-disable-next-line 
-function TitleItem(props) { };
-
 // 类名
-// eslint-disable-next-line 
-function CataItem(props) { };
-// eslint-disable-next-line 
-// 价目表的一项
-// eslint-disable-next-line 
-function PriceItem(props) {
-
+function CategoryRow(props) {
+    return (
+        <tr>
+            <th colSpan="2">{props.cate}</th>
+        </tr>
+    )
 };
+
+// 价目表的一行
+function ProductRow(props) {
+    const product = props.product
+    const name = product.stocked ?
+        product.name :
+        <span style={{color: 'red'}}>{product.name}</span>
+    return (
+        <tr>
+            <td>
+                {name}
+            </td>
+            <td>{product.price}</td>
+        </tr>
+    )
+};
+class ProductTable extends React.Component {
+    render() {
+        const rows = [];
+        let lastCategory = null;
+        this.props.products.forEach((product) => {
+            if (product.category !== lastCategory) {
+                rows.push(
+                    <CategoryRow
+                        cate={product.category}
+                        key={product.category} />
+                )
+            }
+            rows.push(
+                <ProductRow
+                    product={product}
+                    key={product.name} />
+            )
+            lastCategory = product.category;
+        })
+        return(
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>{rows}</tbody>
+            </table>
+        )
+
+    }
+}
+// 拆分后的整体
+class FilterableProductTable  extends React.Component{
+    render(){
+        return(
+            <div>
+                <SearchBar/>
+                <ProductTable products={this.props.products}/>
+            </div>
+        )
+    }
+}
 
 // 总体
-class TestPage extends React.PureComponent {
+class TestPageOld extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -52,11 +102,13 @@ class TestPage extends React.PureComponent {
         this.getLi = this.getLi.bind(this)
     }
     getLi(name) {
+        let row = []
         this.state.mainList.forEach(el => {
             if (el.category === name) {
-                    return <li key={el.name}>{el.name}:{el.price}</li>
+                row.push(<li key={el.name}>{el.name}:{el.price}</li>)
             }
         })
+        return row
     }
     render() {
 
@@ -78,8 +130,6 @@ class TestPage extends React.PureComponent {
         )
     }
 }
-// ReactDOM.render(
-//     <TestPage />,
-//     document.getElementById('philosphy')
-// )
-export { TestPage };
+
+
+export { FilterableProductTable  };
