@@ -5,3 +5,4 @@
 1. // eslint-disable-next-line 不进行编译
 1. {}可以放一个arr作为自动循环遍历，其中项是hrml标签
 1. class组件直接this.props.attr调用即可
+1. 自底向上数据流通过onChange传递

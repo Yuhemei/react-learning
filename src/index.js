@@ -4,7 +4,7 @@ import './index.css';
 import { FilterableProductTable } from './started/index.js'
 
 // ========================================
-const PRODUCTS= [
+const PRODUCTS = [
     { category: "Sporting Goods", price: "$49.99", stocked: true, name: "Football" },
     { category: "Sporting Goods", price: "$9.99", stocked: true, name: "Baseball" },
     { category: "Sporting Goods", price: "$29.99", stocked: false, name: "Basketball" },
@@ -15,7 +15,7 @@ const PRODUCTS= [
 // 进行渲染
 ReactDOM.render(
     // <Game />,
-    <FilterableProductTable   products={PRODUCTS}/>,
+    <FilterableProductTable products={PRODUCTS} />,
     // root was in ~/public/index.html
     document.getElementById('root')
 );

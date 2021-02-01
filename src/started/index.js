@@ -5,11 +5,28 @@ import './index.css';
 // 顶部SearchBar
 function SearchBar(props) {
     // name label value
+    const filterText = props.filterText
+    const inStrokeOnly = props.inStrokeOnly
+    function handleFilterTextChange(e){
+         props.onFilterTextChange(e.target.value)
+    }
+    function handleInStrokeOnlyChange(e){
+        props.onInStrokeOnlyChange(e.target.checked)
+    }
     return (
         <form>
-            <input type="text" placeholder="Search..." />
+            <input
+                type="text"
+                placeholder="Search..."
+                value={filterText}
+                onChange={handleFilterTextChange}
+            />
             <p>
-                <input type="checkbox"/>
+                <input
+                    type="checkbox"
+                    checked={inStrokeOnly}
+                    onChange={handleInStrokeOnlyChange}
+                />
                 {''}
                 Only show products in stock
             </p>
@@ -30,7 +47,7 @@ function ProductRow(props) {
     const product = props.product
     const name = product.stocked ?
         product.name :
-        <span style={{color: 'red'}}>{product.name}</span>
+        <span style={{ color: 'red' }}>{product.name}</span>
     return (
         <tr>
             <td>
@@ -42,9 +59,19 @@ function ProductRow(props) {
 };
 class ProductTable extends React.Component {
     render() {
+        const filterText = this.props.filterText;
+        const inStrokeOnly = this.props.inStrokeOnly
+
         const rows = [];
         let lastCategory = null;
+
         this.props.products.forEach((product) => {
+            if (product.name.indexOf(filterText) == -1) {
+                return;
+            }
+            if (inStrokeOnly && !product.stocked) {
+                return;
+            }
             if (product.category !== lastCategory) {
                 rows.push(
                     <CategoryRow
@@ -59,7 +86,7 @@ class ProductTable extends React.Component {
             )
             lastCategory = product.category;
         })
-        return(
+        return (
             <table>
                 <thead>
                     <tr>
@@ -74,62 +101,39 @@ class ProductTable extends React.Component {
     }
 }
 // 拆分后的整体
-class FilterableProductTable  extends React.Component{
-    render(){
-        return(
-            <div>
-                <SearchBar/>
-                <ProductTable products={this.props.products}/>
-            </div>
-        )
-    }
-}
-
-// 总体
-class TestPageOld extends React.PureComponent {
+class FilterableProductTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            mainList: [
-                { category: "Sporting Goods", price: "$49.99", stocked: true, name: "Football" },
-                { category: "Sporting Goods", price: "$9.99", stocked: true, name: "Baseball" },
-                { category: "Sporting Goods", price: "$29.99", stocked: false, name: "Basketball" },
-                { category: "Electronics", price: "$99.99", stocked: true, name: "iPod Touch" },
-                { category: "Electronics", price: "$399.99", stocked: false, name: "iPhone 5" },
-                { category: "Electronics", price: "$199.99", stocked: true, name: "Nexus 7" }
-            ]
-        }
-        this.getLi = this.getLi.bind(this)
+            filterText: '',
+            inStrokeOnly: false
+        };
+        this.handleFilterTextChange=this.handleFilterTextChange.bind(this)
+        this.handleInStrokeOnlyChange=this.handleInStrokeOnlyChange.bind(this)
     }
-    getLi(name) {
-        let row = []
-        this.state.mainList.forEach(el => {
-            if (el.category === name) {
-                row.push(<li key={el.name}>{el.name}:{el.price}</li>)
-            }
-        })
-        return row
+    handleFilterTextChange(filterText) {
+        this.setState({ filterText: filterText })
+    }
+    handleInStrokeOnlyChange(inStrokeOnly) {
+        this.setState({ inStrokeOnly: inStrokeOnly })
     }
     render() {
-
         return (
-            <div className="test-page-container">
-                <input type="text" placeholder="Search..."></input>
-                <input type="checkbox"></input>
-                <span>Only show products in stock</span>
-                <h5>Name  Price</h5>
-                <h5>Sporting Goods</h5>
-                <ul>
-                    {this.getLi("Sporting Goods")}
-                </ul>
-                <h5>Electronics</h5>
-                <ul>
-                    {this.getLi("Electronics")}
-                </ul>
+            <div>
+                <SearchBar
+                    filterText={this.state.filterText}
+                    inStrokeOnly={this.state.inStrokeOnly}
+                    onFilterTextChange={this.handleFilterTextChange}
+                    onInStrokeOnlyChange={this.handleInStrokeOnlyChange}
+                />
+                <ProductTable
+                    products={this.props.products}
+                    filterText={this.state.filterText}
+                    inStrokeOnly={this.state.inStrokeOnly}
+                />
             </div>
         )
     }
 }
 
-
-export { FilterableProductTable  };
+export { FilterableProductTable };
