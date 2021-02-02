@@ -1,7 +1,6 @@
 # React入门
 
 * 2021.1.22 by 于贺美
-      
 
 ## JSX语法
 
@@ -20,6 +19,7 @@ jsx使用小驼峰进行命名 camelCase  class=>className
 1. JSX只更新它需要更新的部分
 
 1. props内的attr 都可以标签内绑定（是否camelCase还不一定）
+
 ```js
 function Welcome(props) {
   return <h1>Hello, {props.name}</h1>;
@@ -30,6 +30,12 @@ ReactDOM.render(
   element,
   document.getElementById('root')
 );
+```
+
+1. style有两个{}
+
+```jsx
+<li style={{color:isOnline?'green' : 'black'}}></li>
 ```
 
 1. 组件名称必须CamelCase
@@ -43,6 +49,7 @@ ReactDOM.render(
 * 将函数体移动到 render() 方法之中。
 * 在 render() 方法中使用 this.props 替换 props。
 * 删除剩余的空函数声明。
+
 ```js
 class Clock extends React.Component {
   render() {
@@ -55,6 +62,7 @@ class Clock extends React.Component {
   }
 }
 ```
+
 1. `super(props);`是将props传递到父组件中，并不是继承
 
 ```js
@@ -79,6 +87,7 @@ ReactDOM.render(
   document.getElementById('root')
 );
 ```
+
 1. React.createElement()与const搭配创建jsx组件
 
 ### 生命周期
@@ -89,6 +98,8 @@ class Clock extends React.Component {
     super(props);
     this.state = {date: new Date()};
   }
+
+  // componentDidUpdate
 
   componentDidMount() {
     this.timerID = setInterval(
@@ -262,14 +273,19 @@ render() {
   ```
 
 ### 列表&Key
+
 1. Array.prototype.map()
 1. must key
-  *   因为React是根据组件的变化来更新有必要更新的组件，在此基础上借助唯一标识的key来进行良好的更新渲染
+  
+  因为React是根据组件的变化来更新有必要更新的组件，在此基础上借助唯一标识的key来进行良好的更新渲染
+
 1. should string&unique
 
 ### 表单
+
 1. 受控组件
 适用于 input，select(默认项为selected),textarea
+
 ```jsx
 // 1.state
 this.state={value:''}
@@ -284,6 +300,7 @@ method(event){
   <input type="text" value={this.state.value} onChange={this.method}>
 </form>
 ```
+
 * 至此，以上代码成为一个受控组件
 
 1. `<select multiple={true} value={['B', 'C']}>`
@@ -339,7 +356,9 @@ class Reservation extends React.Component {
   }
 }
 ```
+
 1. 指定了value
+
 ```jsx
 ReactDOM.render(<input value="hi" />, mountNode);
 // 如果一开始指定了value 会使输入框不可编辑 但是将其内容置为undefined或null可恢复编辑
@@ -347,6 +366,7 @@ setTimeout(function() {
   ReactDOM.render(<input value={null} />, mountNode);
 }, 1000);
 ```
+
 1. 非受控组件
 
 1. [Formik](https://formik.org/)
@@ -396,6 +416,7 @@ class Calculator extends React.Component {
   }
 }
 ```
+
 ### 组合VS继承
 
 ```jsx
@@ -424,6 +445,7 @@ function App() {
   );
 }
 ```
+
 ### React哲学
 
 1. 将UI划分为组件层级
@@ -455,3 +477,111 @@ function App() {
     * onChange由子寄父
     让我们重新梳理一下需要实现的功能：每当用户改变表单的值，我们需要改变 state 来反映用户的当前输入。由于 state 只能由拥有它们的组件进行更改，FilterableProductTable 必须将一个能够触发 state 改变的回调函数（callback）传递给 SearchBar。我们可以使用输入框的 onChange 事件来监视用户输入的变化，并通知 FilterableProductTable 传递给 SearchBar 的回调函数。然后该回调函数将调用 setState()，从而更新应用。
 
+## hook语法
+
+### State Hook
+
+```js
+const [value,setValue] = setState(initialState);
+```
+
+### Effect Hook
+
+1. useEffect将生命周期合成为一个API
+1. 可加可清
+
+```jsx
+useEffect(() => {
+    ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+    // return函数即为清楚操作
+    return () => {
+      ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+    };
+```
+
+1. 可多次调用
+
+1. 自定义hook useSomething命名
+
+```jsx
+function Example() {
+  const locale = useContext(LocaleContext);
+  const theme = useContext(ThemeContext);
+  // ...
+}
+```
+
+1. 跳过effect进行性能优化
+
+```js
+useEffect(() => {
+  document.title = `You clicked ${count} times`;
+}, [count]); // 仅在 count 更改时更新
+```
+
+如果想执行只运行一次的 effect（仅在组件挂载和卸载时执行），可以传递一个空数组（[]）作为第二个参数。这就告诉 React 你的 effect 不依赖于 props 或 state 中的任何值，所以它永远都不需要重复执行。这并不属于特殊情况 —— 它依然遵循依赖数组的工作方式。
+
+如果你传入了一个空数组（[]），effect 内部的 props 和 state 就会一直拥有其初始值。尽管传入 [] 作为第二个参数更接近大家更熟悉的 componentDidMount 和 componentWillUnmount 思维模式，但我们有更好的方式来避免过于频繁的重复调用 effect。除此之外，请记得 Rea
+
+* 此规则会在添加错误依赖时发出警告并给出修复建议。
+npm install eslint-plugin-react-hooks --save-dev
+
+1. 自定义Hook
+
+```js
+import { useState, useEffect } from 'react';
+
+function useFriendStatus(friendID) {
+  const [isOnline, setIsOnline] = useState(null);
+
+  useEffect(() => {
+    function handleStatusChange(status) {
+      setIsOnline(status.isOnline);
+    }
+
+    ChatAPI.subscribeToFriendStatus(friendID, handleStatusChange);
+    return () => {
+      ChatAPI.unsubscribeFromFriendStatus(friendID, handleStatusChange);
+    };
+  });
+
+  return isOnline;
+}
+```
+
+* 和reducer有关的
+
+```js
+function useReducer(reducer, initialState) {
+  const [state, setState] = useState(initialState);
+
+  function dispatch(action) {
+    const nextState = reducer(state, action);
+    setState(nextState);
+  }
+
+  return [state, dispatch];
+}
+```
+
+* 调用
+
+```js
+function Todos() {
+  const [todos, dispatch] = useReducer(todosReducer, []);
+
+  function handleAddClick(text) {
+    dispatch({ type: 'add', text });
+  }
+
+  // ...
+}
+```
+
+### useContext
+
+1. const value = useContext(MyContext);
+
+MyContext必须是context本身，不可以是AnyObj.context
+
+1. 
