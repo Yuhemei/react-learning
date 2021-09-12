@@ -59,7 +59,7 @@ class Board extends React.Component {
     }
 }
 // eslint-disable-next-line 
-class Game extends React.Component {
+export class Game extends React.Component {
     constructor(props) {
         // 
         super(props);
